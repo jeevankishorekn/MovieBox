@@ -44,18 +44,15 @@ class MainFragment : Fragment(R.layout.fragment_main), MainFragmentListener {
         super.onViewCreated(view, savedInstanceState)
         NPRecyclerView = view.findViewById(R.id.nowPlayingView)
         PRecyclerView = view.findViewById(R.id.popularView)
-        val nowPlayingResult = getNowPlayingMovies()
-        Log.d(TAG, "onViewCreated: ${nowPlayingResult.size}")
-        NPViewAdapter = NPRecyclerAdapter(nowPlayingResult)
+        NPViewAdapter = NPRecyclerAdapter(mutableListOf())
         NPRecyclerView.adapter = NPViewAdapter
-        NPRecyclerView.layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.HORIZONTAL, true)
+        NPRecyclerView.layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.HORIZONTAL, false)
+        getNowPlayingMovies()
 
-        getPopularMovies()
         PViewAdapter = PRecyclerAdapter(mutableListOf(),this)
         PRecyclerView.adapter = PViewAdapter
         PRecyclerView.layoutManager = LinearLayoutManager(ctx)
-
-
+        getPopularMovies()
     }
 
     private fun getPopularMovies() {
@@ -73,8 +70,7 @@ class MainFragment : Fragment(R.layout.fragment_main), MainFragmentListener {
                     for( item in response.body()!!.results)
                         result.add(item)
                     Log.d(TAG, "onResponse: ${result.size}")
-                    PViewAdapter = PRecyclerAdapter(result,this@MainFragment)
-                    PRecyclerView.adapter = PViewAdapter
+                    PViewAdapter.refresh(result)
 
                 }
             }
@@ -85,7 +81,7 @@ class MainFragment : Fragment(R.layout.fragment_main), MainFragmentListener {
         })
     }
 
-    private fun getNowPlayingMovies(): MutableList<Result> {
+    private fun getNowPlayingMovies(){
         val call = RetrofitObject.retrofitObject.create(RetrofitService::class.java)
             .getNowPlayingMovies(API_KEY)
 
@@ -100,8 +96,7 @@ class MainFragment : Fragment(R.layout.fragment_main), MainFragmentListener {
                     for( item in response.body()!!.results)
                         result.add(item)
                     Log.d(TAG, "onResponse: ${result.size}")
-                    NPViewAdapter = NPRecyclerAdapter(result)
-                    NPRecyclerView.adapter = NPViewAdapter
+                    NPViewAdapter.refresh(result)
 
                 }
             }
@@ -110,7 +105,6 @@ class MainFragment : Fragment(R.layout.fragment_main), MainFragmentListener {
                 Log.d(TAG, "onFailure: {${t.message}")
             }
         })
-        return result
     }
 
     override fun getMoviesById(result: com.jeevan.moviebox.Model.Popular.Result) {

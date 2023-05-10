@@ -27,6 +27,7 @@ class MovieDetailFragment : Fragment(R.layout.fragment_movie_detail) {
     companion object{
         val TAG = "MovieDetailFragment"
     }
+
     @RequiresApi(33)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -39,7 +40,8 @@ class MovieDetailFragment : Fragment(R.layout.fragment_movie_detail) {
 
         movieTitle.text = item?.title
         release.text = item?.release_date
-        rating.text = item?.vote_average.toString()
+        var ratingVal = item?.vote_average.toString()
+        if (ratingVal == "null") rating.text = "" else rating.text = ratingVal
         overview.text = item?.overview
         val options = RequestOptions.fitCenterTransform()
             .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)

@@ -1,5 +1,6 @@
 package com.jeevan.moviebox.Adapters
 
+import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,12 +9,15 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import com.jeevan.moviebox.Listeners.MainFragmentListener
 import com.jeevan.moviebox.Model.Popular.Result
 import com.jeevan.moviebox.R
 
-class PRecyclerAdapter(private val data : List<Result>, private val listener : MainFragmentListener) : RecyclerView.Adapter<PRecyclerAdapter.PRecyclerAdapterViewHolder>() {
+class PRecyclerAdapter(private val dataSet : List<Result>, private val listener : MainFragmentListener) : RecyclerView.Adapter<PRecyclerAdapter.PRecyclerAdapterViewHolder>() {
 
+    var data = dataSet
     val IMAGE_URL = "https://image.tmdb.org/t/p/w92"
 
     class PRecyclerAdapterViewHolder(view: View) : RecyclerView.ViewHolder(view){
@@ -34,10 +38,18 @@ class PRecyclerAdapter(private val data : List<Result>, private val listener : M
         return PRecyclerAdapterViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.movie_data_item,parent, false))
     }
 
+    fun refresh(dataReceived: List<Result>){
+        data = dataReceived
+        notifyDataSetChanged()
+    }
+
     override fun onBindViewHolder(holder: PRecyclerAdapterViewHolder, position: Int) {
         holder.title.text = data[position].title
         holder.date.text = data[position].release_date
-        Glide.with(holder.poster).load(IMAGE_URL + data[position].poster_path).into(holder.poster)
+        val options = RequestOptions.fitCenterTransform()
+            .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+            .encodeFormat(Bitmap.CompressFormat.PNG)
+        Glide.with(holder.poster).load(IMAGE_URL + data[position].poster_path).apply(options).into(holder.poster)
 
         holder.consLayout.setOnClickListener{
             listener.getMoviesById(data[position])
