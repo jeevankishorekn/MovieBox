@@ -1,11 +1,13 @@
 package com.jeevan.moviebox.Fragments
 
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
@@ -23,6 +25,10 @@ class MovieDetailFragment : Fragment(R.layout.fragment_movie_detail) {
     lateinit var release : TextView
     lateinit var rating : TextView
     lateinit var overview : TextView
+    lateinit var ratingText: TextView
+    lateinit var releaseText: TextView
+    lateinit var overviewText: TextView
+
     val IMAGE_URL = "https://image.tmdb.org/t/p/w500"
     companion object{
         val TAG = "MovieDetailFragment"
@@ -35,14 +41,26 @@ class MovieDetailFragment : Fragment(R.layout.fragment_movie_detail) {
         movieTitle = view.findViewById(R.id.movieTitle)
         movieImage = view.findViewById(R.id.movie_image)
         release = view.findViewById(R.id.release_date)
+        releaseText = view.findViewById(R.id.release_date_text)
         rating = view.findViewById(R.id.rating)
+        ratingText = view.findViewById(R.id.rating_text)
         overview = view.findViewById(R.id.overview)
+        overviewText = view.findViewById(R.id.overview_text)
 
-        movieTitle.text = item?.title
+        movieTitle.apply {
+            text = item?.title
+            setTextColor(Color.WHITE)
+            textSize = 24f
+        }
         release.text = item?.release_date
+        if (release.text == "") releaseText.text = ""
         var ratingVal = item?.vote_average.toString()
-        if (ratingVal == "null") rating.text = "" else rating.text = ratingVal
+        if (ratingVal == "null") {
+            rating.text = ""
+            ratingText.text = ""
+        } else rating.text = ratingVal
         overview.text = item?.overview
+        if (overview.text == "") overviewText.text = ""
         val options = RequestOptions.fitCenterTransform()
             .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
             .encodeFormat(Bitmap.CompressFormat.PNG)
